@@ -2,11 +2,12 @@ package com.hospital.prescription_system.controller;
 
 import com.hospital.prescription_system.entity.Patient;
 import com.hospital.prescription_system.service.PatientService;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-
+//@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/api/patients")
 public class PatientController {

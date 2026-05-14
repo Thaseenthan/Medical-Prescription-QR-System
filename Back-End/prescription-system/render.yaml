@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: prescription-backend
+    env: java
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: DATABASE_URL
+        scope: build,runtime
+      - key: DATABASE_USERNAME
+        scope: build,runtime
+      - key: DATABASE_PASSWORD
+        scope: build,runtime
+      - key: MAIL_USERNAME
+        scope: build,runtime
+      - key: MAIL_PASSWORD
+        scope: build,runtime
+      - key: ADMIN_USERNAME
+        scope: build,runtime
+      - key: ADMIN_PASSWORD
+        scope: build,runtime
+      - key: PORT
+        value: 8080

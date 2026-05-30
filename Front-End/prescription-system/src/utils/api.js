@@ -1,5 +1,5 @@
-// API Base URL - Change this to your backend URL
-const API_BASE_URL = 'http://localhost:8080/api';
+// API Base URL - Uses environment variable or defaults to localhost
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // Generic API call function
 const apiCall = async (endpoint, method = 'GET', body = null) => {
@@ -64,6 +64,26 @@ export const prescriptionAPI = {
   create: (prescription) => apiCall('/prescriptions', 'POST', prescription),
   delete: (id) => apiCall(`/prescriptions/${id}`, 'DELETE'),
   getQRCode: (id) => `${API_BASE_URL}/prescriptions/${id}/qrcode`,
+  downloadPDF: async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/prescriptions/${id}/pdf`);
+      if (!response.ok) {
+        throw new Error('Failed to download PDF');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `prescription_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      throw error;
+    }
+  },
 };
 
 // Auth API

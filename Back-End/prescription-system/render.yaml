@@ -19,5 +19,3 @@ services:
         scope: build,runtime
       - key: ADMIN_PASSWORD
         scope: build,runtime
-      - key: PORT
-        value: 8080

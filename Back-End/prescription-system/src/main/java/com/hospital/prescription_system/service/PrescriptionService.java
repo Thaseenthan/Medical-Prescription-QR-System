@@ -64,9 +64,12 @@ public class PrescriptionService {
         }
 
         // Generate QR code (optional)
-        //byte[] qrCode = qrCodeService.generateQRCode(savedPrescription.getId().toString());
-        byte[] qrCode = qrCodeService.generateQRCode("https://portfolio-thaseenthan.vercel.app/");
-        //qrCodeService.generateQRCodeFile(savedPrescription.getId().toString(), "prescription-"+savedPrescription.getId()+".png");
+        // QR code encodes URL to prescription viewer app with prescription ID
+        // Replace with your ngrok URL or deployed frontend URL
+        // ngrok example: https://abc123.ngrok.io/prescription/{id}
+        // local testing: http://192.168.x.x:3000/prescription/{id}
+        String qrUrl = "https://YOUR_NGROK_FRONTEND_URL.ngrok.io/prescription/" + savedPrescription.getId();
+        byte[] qrCode = qrCodeService.generateQRCode(qrUrl);
 
         // Send email to patient (optional)
         if (savedPrescription.getPatient() != null && savedPrescription.getPatient().getEmail() != null) {

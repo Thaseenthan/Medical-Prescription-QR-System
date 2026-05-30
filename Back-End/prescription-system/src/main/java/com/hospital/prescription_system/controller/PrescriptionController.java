@@ -4,6 +4,7 @@ import com.hospital.prescription_system.dto.PrescriptionRequestDTO;
 import com.hospital.prescription_system.entity.Prescription;
 import com.hospital.prescription_system.service.PrescriptionService;
 import com.hospital.prescription_system.service.QRCodeService;
+import com.hospital.prescription_system.service.PdfService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +21,12 @@ public class PrescriptionController {
 
     private final PrescriptionService prescriptionService;
     private final QRCodeService qrCodeService;
+    private final PdfService pdfService;
 
-    public PrescriptionController(PrescriptionService prescriptionService, QRCodeService qrCodeService) {
+    public PrescriptionController(PrescriptionService prescriptionService, QRCodeService qrCodeService, PdfService pdfService) {
         this.prescriptionService = prescriptionService;
         this.qrCodeService = qrCodeService;
+        this.pdfService = pdfService;
     }
 
     // create prescription
@@ -93,6 +96,26 @@ public class PrescriptionController {
                 .body(qrCode);
     }
 
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> downloadPrescriptionPDF(@PathVariable UUID id) {
+        // Check if prescription exists
+        var prescription = prescriptionService.getPrescriptionById(id);
+        if (prescription == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Generate PDF
+        byte[] pdfBytes = pdfService.generatePrescriptionPDF(prescription);
+        if (pdfBytes == null) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+        // Return as PDF file
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=prescription_" + id + ".pdf")
+                .body(pdfBytes);
+    }
 
     // delete prescription
     @DeleteMapping("/{id}")

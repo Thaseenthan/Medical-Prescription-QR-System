@@ -48,6 +48,15 @@ const ViewPrescriptions = ({ authUser }) => {
     }
   };
 
+  const handleDownloadPDF = async (id) => {
+    try {
+      await prescriptionAPI.downloadPDF(id);
+    } catch (err) {
+      alert('Failed to download prescription PDF');
+      console.error('Error downloading PDF:', err);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
@@ -172,6 +181,15 @@ const ViewPrescriptions = ({ authUser }) => {
 
             <div className="text-sm text-gray-600 text-center">
               Created: {formatDate(selectedPrescription.createdAt)}
+            </div>
+
+            <div className="flex gap-3 justify-center mt-6">
+              <button
+                onClick={() => handleDownloadPDF(selectedPrescription.id)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200 flex items-center gap-2"
+              >
+                📥 Download as PDF
+              </button>
             </div>
           </div>
         ) : (

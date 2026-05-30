@@ -3,6 +3,8 @@ import Card from '../../components/Card';
 import { patientAPI, doctorAPI, prescriptionAPI } from '../../utils/api';
 
 const CreatePrescription = ({ authUser, onSuccess }) => {
+  const labelClass = 'inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700 mb-2';
+
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [formData, setFormData] = useState({
@@ -80,6 +82,17 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
     setMedicines(updatedMedicines);
   };
 
+  const handleClear = () => {
+    setError('');
+    setSuccess('');
+    setFormData((prev) => ({
+      ...prev,
+      patientId: '',
+      diagnosis: '',
+    }));
+    setMedicines([{ name: '', dosage: '', frequency: '', duration: '' }]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -123,11 +136,15 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
   };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Create Prescription</h1>
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Create Prescription</h1>
+        <p className="text-gray-500 mt-2">Assign patient, verify doctor, and add medicine schedule.</p>
+      </div>
 
-      <Card>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <Card className="overflow-hidden border border-indigo-100 shadow-lg shadow-indigo-100/40">
+        <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500" />
+        <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6 bg-gradient-to-br from-white to-slate-50">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
               {error}
@@ -139,69 +156,79 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Patient *
-              </label>
-              <select
-                name="patientId"
-                value={formData.patientId}
-                onChange={handleChange}
-                required
-                className="input-field"
-              >
-                <option value="">Choose a patient</option>
-                {patients.map((patient) => (
-                  <option key={patient.id} value={patient.id}>
-                    {patient.name} - {patient.age}y - {patient.gender}
-                  </option>
-                ))}
-              </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">Prescription Details</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className={labelClass}>
+                    Select Patient *
+                  </label>
+                  <select
+                    name="patientId"
+                    value={formData.patientId}
+                    onChange={handleChange}
+                    required
+                    className="input-field focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
+                  >
+                    <option value="">Choose a patient</option>
+                    {patients.map((patient) => (
+                      <option key={patient.id} value={patient.id}>
+                        {patient.name} - {patient.age}y - {patient.gender}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>
+                    Select Doctor *
+                  </label>
+                  <select
+                    name="doctorId"
+                    value={formData.doctorId}
+                    onChange={handleChange}
+                    required
+                    className="input-field focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
+                    disabled
+                  >
+                    <option value="">Loading logged doctor...</option>
+                    {doctors.map((doctor) => (
+                      <option key={doctor.id} value={doctor.id}>
+                        {doctor.name} - {doctor.specialization} ({doctor.doctorId})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Doctor is fixed to currently logged-in account.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Doctor *
-              </label>
-              <select
-                name="doctorId"
-                value={formData.doctorId}
-                onChange={handleChange}
-                required
-                className="input-field"
-                disabled
-              >
-                <option value="">Loading logged doctor...</option>
-                {doctors.map((doctor) => (
-                  <option key={doctor.id} value={doctor.id}>
-                    {doctor.name} - {doctor.specialization} ({doctor.doctorId})
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Doctor is fixed to currently logged-in account.
-              </p>
-            </div>
-          </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">Diagnosis Notes</h2>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Diagnosis *
-            </label>
-            <textarea
-              name="diagnosis"
-              value={formData.diagnosis}
-              onChange={handleChange}
-              required
-              rows="3"
-              className="input-field"
-              placeholder="Enter diagnosis details..."
-            />
+              <div>
+                <label className={labelClass}>
+                  Diagnosis *
+                </label>
+                <textarea
+                  name="diagnosis"
+                  value={formData.diagnosis}
+                  onChange={handleChange}
+                  required
+                  rows="7"
+                  className="input-field focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+                  placeholder="Enter diagnosis details..."
+                />
+              </div>
+            </div>
           </div>
 
           {/* Medicines Section */}
-          <div className="border-t pt-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800">Medicines</h3>
               <button
@@ -216,7 +243,7 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
             {medicines.map((medicine, index) => (
               <div
                 key={index}
-                className="bg-gray-50 p-4 rounded-lg mb-4 relative"
+                className="bg-slate-50 border border-slate-200 p-4 rounded-lg mb-4 relative"
               >
                 {medicines.length > 1 && (
                   <button
@@ -228,9 +255,9 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
                   </button>
                 )}
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className={labelClass}>
                       Medicine Name *
                     </label>
                     <input
@@ -240,13 +267,13 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
                         handleMedicineChange(index, 'name', e.target.value)
                       }
                       required
-                      className="input-field"
+                      className="input-field focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
                       placeholder="e.g., Amoxicillin"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className={labelClass}>
                       Dosage *
                     </label>
                     <input
@@ -256,13 +283,13 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
                         handleMedicineChange(index, 'dosage', e.target.value)
                       }
                       required
-                      className="input-field"
+                      className="input-field focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
                       placeholder="e.g., 500mg"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className={labelClass}>
                       Frequency *
                     </label>
                     <input
@@ -272,13 +299,13 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
                         handleMedicineChange(index, 'frequency', e.target.value)
                       }
                       required
-                      className="input-field"
+                      className="input-field focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
                       placeholder="e.g., 3 times a day"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className={labelClass}>
                       Duration *
                     </label>
                     <input
@@ -288,7 +315,7 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
                         handleMedicineChange(index, 'duration', e.target.value)
                       }
                       required
-                      className="input-field"
+                      className="input-field focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
                       placeholder="e.g., 7 days"
                     />
                   </div>
@@ -301,11 +328,11 @@ const CreatePrescription = ({ authUser, onSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed bg-blue-300 p-2 rounded-xl border-blue-300 hover:bg-blue-400 hover:border-blue-400 transition"
             >
               {loading ? 'Creating...' : 'Create Prescription'}
             </button>
-            <button type="button" className="btn-secondary">
+            <button type="button" onClick={handleClear} className="btn-secondary bg-gray-400 p-2 rounded-xl border-gray-400">
               Clear
             </button>
           </div>
